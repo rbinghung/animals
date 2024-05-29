@@ -12,11 +12,37 @@ class AnimalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //查詢資源列表
-        $animals=Animal::get();
-        return \response(['data'=>$animals],Response::HTTP_OK);
+        //查詢關鍵字
+        $query = Animal::query();
+        if (isset($request->filters)){
+            $filters = explode(',',$request->filters);
+            foreach ($filters as $key=>$filter){
+                list($key,$value) = explode(':',$filter);
+                $query->where($key,'like','%'.$value.'%');
+            }
+        }
+        //查詢資源列表::  需要優化分頁機制
+//        $animals=Animal::get();
+//        return \response(['data'=>$animals],Response::HTTP_OK);
+        $limit=$request->limit ?? 10;
+        $animals=Animal::orderBy('id','desc')->paginate($limit)->appends($request->query());
+        return \response($animals,Response::HTTP_OK);
+
+        //資源列表排序
+        if (isset($request->sorts)){
+            $sorts = explode(',',$request->sorts);
+            foreach ($sorts as $key=>$sort){
+                list($key,$value) = explode(':',$sort);
+                if ($value=='asc' || $value=='desc'){
+                    $query->orderBy($key,$value);
+                }else{
+                    $query->orderBy('id','desc');
+                }
+            }
+
+        }
     }
 
     /**
