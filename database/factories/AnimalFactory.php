@@ -24,7 +24,7 @@ class AnimalFactory extends Factory
             'fix'=>$this->faker->boolean,
             'description'=>$this->faker->text,
             'personality'=>$this->faker->text,
-            'user_id'=>User::all()->random()->id
+//            'user_id'=>User::all()->random()->id
 
         ];
     }
