@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Animal;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Cache;
 class AnimalController extends Controller
 {
     /**
@@ -16,6 +17,8 @@ class AnimalController extends Controller
     {
         //查詢關鍵字
         $query = Animal::query();
+        $limit=$request->limit ?? 10;
+
         if (isset($request->filters)){
             $filters = explode(',',$request->filters);
             foreach ($filters as $key=>$filter){
@@ -26,9 +29,7 @@ class AnimalController extends Controller
         //查詢資源列表::  需要優化分頁機制
 //        $animals=Animal::get();
 //        return \response(['data'=>$animals],Response::HTTP_OK);
-        $limit=$request->limit ?? 10;
-        $animals=Animal::orderBy('id','desc')->paginate($limit)->appends($request->query());
-        return \response($animals,Response::HTTP_OK);
+
 
         //資源列表排序
         if (isset($request->sorts)){
@@ -43,6 +44,18 @@ class AnimalController extends Controller
             }
 
         }
+        $url=$request->url();
+        $queryParams=$request->query();
+        Ksort($queryParams);
+        $queryString=http_build_query($queryParams);
+        $fullUrl="{$url}?{$queryString}";
+        if (Cache::has($fullUrl)){
+            return Cache::get($fullUrl);
+        }
+        $animals=$query->paginate($limit)->appends($request->query());
+        return Cache::remember($fullUrl,60,function ()use($animals){
+            return \response($animals,Response::HTTP_OK);
+        });
     }
 
     /**
