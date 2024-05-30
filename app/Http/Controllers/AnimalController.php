@@ -66,6 +66,7 @@ class AnimalController extends Controller
     public function create()
     {
         //
+        return \response('ok',Response::HTTP_OK);
     }
 
     /**
@@ -76,7 +77,19 @@ class AnimalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 驗證規則
+        $rules = [
+            'type_id' => 'null|integer',
+            'name' => 'required|string|max:255',
+            'birthday' => 'null|date',
+            'area'=>'null|string|max:255',
+            'fix'=>'required|boolean',
+            'description'=>'nullable',
+            'personality'=>'nullable'
+        ];
+       $this->validate($request,$rules);
+
+        $request['user_id']=1;
         $animal=Animal::create($request->all());
         $animal=$animal->refresh();
         return \response($animal,Response::HTTP_CREATED);
@@ -103,6 +116,8 @@ class AnimalController extends Controller
     public function edit(Animal $animal)
     {
         //
+        return \response('ok',Response::HTTP_OK);
+
     }
 
     /**
