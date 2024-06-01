@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Carbon\Carbon;
 class Animal extends Model
 {
     use HasFactory;
@@ -22,4 +22,11 @@ class Animal extends Model
         'description',
         'personality',
     ];
+    public function type(){
+        return $this->belongsTo('App\Models\Type');
+    }
+    public function getAgeAttribute(){
+        $diff=Carbon::now()->diff($this->birthday);
+        return "{$diff->y}歲 {$diff->m}月";
+    }
 }
