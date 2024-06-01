@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AnimalCollection;
 use App\Models\Animal;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Resources\AnimalResource;
 class AnimalController extends Controller
 {
     /**
@@ -16,7 +18,7 @@ class AnimalController extends Controller
     public function index(Request $request)
     {
         //查詢關鍵字
-        $query = Animal::query();
+        $query = Animal::query()->with('type');
         $limit=$request->limit ?? 10;
 
         if (isset($request->filters)){
@@ -54,7 +56,8 @@ class AnimalController extends Controller
         }
         $animals=$query->paginate($limit)->appends($request->query());
         return Cache::remember($fullUrl,60,function ()use($animals){
-            return \response($animals,Response::HTTP_OK);
+//            return \response($animals,Response::HTTP_OK);
+            return new AnimalCollection($animals);
         });
     }
 
@@ -79,7 +82,7 @@ class AnimalController extends Controller
     {
         // 驗證規則
         $rules = [
-            'type_id' => 'null|integer',
+            'type_id' => 'null|exists:types,id',
             'name' => 'required|string|max:255',
             'birthday' => 'null|date',
             'area'=>'null|string|max:255',
@@ -104,7 +107,9 @@ class AnimalController extends Controller
     public function show(Animal $animal)
     {
         //查詢單一資源
-        return \response($animal,Response::HTTP_OK);
+//        return \response($animal,Response::HTTP_OK);
+        return new AnimalResource($animal);
+
     }
 
     /**
