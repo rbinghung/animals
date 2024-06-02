@@ -27,6 +27,16 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
         Passport::routes();
 
-        //
+        //自訂Token 過期時間
+
+        //access_token
+        Passport::tokensExpireIn(now()->addDays(15));
+        //refresh_token
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+
+        Passport::tokensCan([
+            'create-animals'=>'建立動物資訊',
+            'user-info'=>'使用者資訊'
+        ]);
     }
 }
