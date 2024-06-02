@@ -16,7 +16,7 @@ class AnimalController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function __construct(){
-        $this->middleware('auth:api',['except'=>['index','show']]);
+        $this->middleware('client',['except'=>['index','show']]);
     }
     public function index(Request $request)
     {
@@ -95,9 +95,10 @@ class AnimalController extends Controller
         ];
        $this->validate($request,$rules);
 
-        $request['user_id']=1;
-        $animal=Animal::create($request->all());
-        $animal=$animal->refresh();
+//        $request['user_id']=1;
+//        $animal=Animal::create($request->all());
+//        $animal=$animal->refresh();
+        $animal=auth()->user()->animals()->create($request->all());
         return \response($animal,Response::HTTP_CREATED);
     }
 

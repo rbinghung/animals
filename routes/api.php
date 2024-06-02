@@ -19,12 +19,12 @@ use App\Http\Controllers\TypeController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::middleware(['auth:api','scope:user-info'])->get('/user',function (Request $request){
-   return $request->user();
-});
+//Route::middleware(['auth:api','scope:user-info'])->get('/user',function (Request $request){
+//   return $request->user();
+//});
 Route::apiResource('animals',AnimalController::class);
 Route::apiResource('types',TypeController::class);
-Route::post('/users/{user}/animals',function (){
-    //do something
-})->middleware('scopes:create-animals,user-info');
+//Route::post('/users/{user}/animals',function (){
+//    //do something
+//})->middleware('scopes:create-animals,user-info');
 
